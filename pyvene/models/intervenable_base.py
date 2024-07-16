@@ -465,11 +465,6 @@ class BaseModel(nn.Module):
             )
 
             # gather based on intervention locations
-            print("IN _gather_intervention_output")
-            print("original_output: ", original_output)
-            print("self.representations[representations_key].unit: ", self.representations[representations_key].unit)
-            print("unit_locations: ", unit_locations)
-            print("device: ", self.get_device())
             selected_output = gather_neurons(
                 original_output,
                 self.representations[representations_key].unit,
@@ -1561,10 +1556,6 @@ class IntervenableModel(BaseModel):
                     else:
                         output = args
 
-                print("IN: hook callback")
-                print("output: ", output)
-                print("key: ", key)
-                print("unit_locations_base[key_i]: ", unit_locations_base[key_i])
                 selected_output = self._gather_intervention_output(
                     output, key, unit_locations_base[key_i]
                 )
@@ -1921,18 +1912,22 @@ class IntervenableModel(BaseModel):
         try:
             # intervene
             if self.mode == "parallel":
-                set_handlers_to_remove = self._wait_for_forward_with_parallel_intervention(
-                    sources,
-                    unit_locations,
-                    activations_sources,
-                    subspaces,
+                set_handlers_to_remove = (
+                    self._wait_for_forward_with_parallel_intervention(
+                        sources,
+                        unit_locations,
+                        activations_sources,
+                        subspaces,
+                    )
                 )
             elif self.mode == "serial":
-                set_handlers_to_remove = self._wait_for_forward_with_serial_intervention(
-                    sources,
-                    unit_locations,
-                    activations_sources,
-                    subspaces,
+                set_handlers_to_remove = (
+                    self._wait_for_forward_with_serial_intervention(
+                        sources,
+                        unit_locations,
+                        activations_sources,
+                        subspaces,
+                    )
                 )
 
             # run intervened forward
@@ -1958,9 +1953,8 @@ class IntervenableModel(BaseModel):
             raise e
         finally:
             self._cleanup_states(
-                skip_activation_gc = \
-                    (sources is None and activations_sources is not None) or \
-                    self.return_collect_activations
+                skip_activation_gc=(sources is None and activations_sources is not None)
+                or self.return_collect_activations
             )
 
         if self.return_collect_activations:

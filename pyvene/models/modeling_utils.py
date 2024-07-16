@@ -303,9 +303,6 @@ def gather_neurons(tensor_input, unit, unit_locations_as_list, device=None):
             device=tensor_input.device if device is None else device,
         )
 
-        print("tensor_input: ", tensor_input)
-        print("unit_locations: ", unit_locations)
-
         tensor_output = torch.gather(
             tensor_input,
             1,
