@@ -1901,7 +1901,7 @@ class IntervenableModel(BaseModel):
                 )
 
             # run intervened forward
-            model_kwargs = {}
+            model_kwargs = {"return_dict": True, "output_hidden_states": True}
             if labels is not None: # for training
                 model_kwargs["labels"] = labels
             if 'use_cache' in self.model.config.to_dict(): # for transformer models

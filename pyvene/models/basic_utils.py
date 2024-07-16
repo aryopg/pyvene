@@ -1,6 +1,7 @@
 """
 Basic Utils
 """
+
 import os
 import copy
 import random
@@ -50,7 +51,11 @@ def embed_to_distrib(model, embed, log=False, logits=False):
                 return vocab
             return lsm(vocab) if log else sm(vocab)
     elif "llama" in model.config.architectures[0].lower():
-        assert False, "Support for LLaMA is not here yet"
+        with torch.inference_mode():
+            vocab = model.lm_head(embed)
+            if logits:
+                return vocab
+            return lsm(vocab) if log else sm(vocab)
 
 
 def set_seed(seed: int):
@@ -127,7 +132,8 @@ def top_vals(tokenizer, res, n=10, return_results=False):
             print(f"{tok:<20} {top_values[i].item()}")
     if return_results:
         return ret
-        
+
+
 def get_list_depth(lst):
     """Return the max depth of the input list"""
     if isinstance(lst, list):
@@ -157,17 +163,6 @@ def GET_LOC(
     From simple locale to nested one.
     """
     if unit == "h.pos":
-        return [ 
-                   [ 
-                       [ 
-                           [LOC[0]] 
-                       ] * batch_size, 
-                       [ 
-                           [LOC[1]] 
-                       ] * batch_size 
-                   ] 
-               ]
+        return [[[[LOC[0]]] * batch_size, [[LOC[1]]] * batch_size]]
     else:
-        raise NotImplementedError(
-            f"{unit} is not supported."
-        )
+        raise NotImplementedError(f"{unit} is not supported.")
